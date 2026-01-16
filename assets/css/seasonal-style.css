@@ -1,0 +1,105 @@
+/* Seasonal Animation Container */
+#seasonal-animation-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    /* Let clicks pass through */
+    z-index: 9999;
+    overflow: hidden;
+}
+
+/* Individual Particles */
+.seasonal-particle {
+    position: absolute;
+    top: -20px;
+    animation-name: fall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    will-change: transform;
+}
+
+/* Keyframes */
+@keyframes fall {
+    0% {
+        transform: translateY(0) translateX(0) rotate(0deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(110vh) translateX(20px) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Summer Effect - Sun flare/Bright Overlay */
+.season-summer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 90% 10%, rgba(255, 223, 0, 0.15), transparent 40%);
+    pointer-events: none;
+    z-index: 9998;
+    mix-blend-mode: screen;
+}
+
+/* FOG / SMOKE EFFECT */
+.seasonal-fog-layer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 200%;
+    height: 300px;
+    /* CSS-only cloud/fog texture using gradients */
+    background:
+        radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.4) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.4) 0%, transparent 50%),
+        radial-gradient(circle at 80% 50%, rgba(255, 255, 255, 0.4) 0%, transparent 50%);
+    background-size: 50% 100%;
+    /* Squeeze them a bit */
+    animation: fog-move 30s linear infinite;
+    z-index: 9990;
+    opacity: 0.6;
+    /* Increased opacity for visibility */
+    pointer-events: none;
+}
+
+.seasonal-fog-layer.layer-2 {
+    bottom: -20px;
+    animation-duration: 40s;
+    opacity: 0.2;
+    z-index: 9991;
+}
+
+@keyframes fog-move {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+
+    100% {
+        transform: translate3d(-50%, 0, 0);
+    }
+}
+
+/* Accessibility: Disable animations if user prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+    .seasonal-fog-layer {
+        display: none !important;
+    }
+}
+
+/* --- Rain / Monsoon Mode --- */
+.seasonal-particle.rain-mode {
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(135, 206, 235, 0.8));
+    width: 2px !important;
+    height: 25px !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    animation-duration: 4.6s !important;
+    animation-timing-function: linear;
+}

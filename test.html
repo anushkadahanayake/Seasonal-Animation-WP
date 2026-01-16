@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seasonal Animation - Local Preview</title>
+
+    <!-- Link the Plugin CSS -->
+    <link rel="stylesheet" href="assets/css/seasonal-style.css">
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f0f0f1;
+            height: 100vh;
+            display: flex;
+            column-gap: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-controls {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            z-index: 10000;
+            /* Above the animation */
+            position: relative;
+            max-width: 500px;
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        button {
+            background: #2271b1;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #135e96;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        input {
+            padding: 8px;
+            width: 70%;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="preview-controls">
+        <h1>Plugin Preview</h1>
+
+        <div class="section">
+            <h3>1. Standard Seasons (All have dynamic smoke)</h3>
+            <button onclick="setSeason('winter')">❄ Winter</button>
+            <button onclick="setSeason('spring')">🌸 Spring</button>
+            <button onclick="setSeason('summer')">☀ Summer</button>
+            <button onclick="setSeason('autumn')">🍂 Autumn</button>
+        </div>
+
+        <div class="section">
+            <h3>2. Holidays (Auto-detected)</h3>
+            <p><small>(Includes new floating holidays)</small></p>
+            <button onclick="setSeason('halloween')">🎃 Halloween</button>
+            <button onclick="setSeason('christmas')">🎅 Christmas</button>
+            <button onclick="setSeason('valentines')">❤️ Valentines</button>
+            <button onclick="setSeason('newyear')">🎉 New Year</button>
+            <button onclick="setSeason('patrick')">🍀 St. Patrick</button>
+            <button onclick="setSeason('easter')">🥚 Easter</button>
+            <button onclick="setSeason('black_friday')">🛍️ Black Friday</button>
+            <button onclick="setSeason('mothers_day')">💐 Mother's Day</button>
+            <button onclick="setSeason('vesak')">☸️ Vesak</button>
+            <button onclick="setSeason('poson')">🪷 Poson</button>
+            <button onclick="setSeason('diwali')">🪔 Diwali</button>
+            <button onclick="setSeason('monsoon')">💧 Monsoon (Rain)</button>
+        </div>
+    </div>
+
+    <div class="preview-controls">
+        <div class="section">
+            <h3>3. Custom Emoji</h3>
+            <input type="text" id="emojiInput" placeholder="Enter emoji (e.g. 🎃, 🦇)" value="🎃">
+            <button onclick="setCustomEmoji()">Test Emoji</button>
+        </div>
+
+        <div class="section">
+            <h3>4. Custom Image URL</h3>
+            <input type="text" id="imgInput" placeholder="Image URL..."
+                value="https://cdn-icons-png.flaticon.com/512/25/25231.png">
+            <button onclick="setCustomImage()">Test Image</button>
+        </div>
+
+        <div class="section">
+            <h3>5. Options</h3>
+            <label>
+                <input type="checkbox" id="fogToggle" onchange="toggleFog()" style="width: auto;"> Enable Fog
+                (Winter/Halloween)
+            </label>
+            <br><br>
+            <label>Intensity:
+                <select id="freqSelect" onchange="setFrequency()">
+                    <option value="10">Very Low</option>
+                    <option value="20">Low</option>
+                    <option value="30" selected>Medium</option>
+                    <option value="60">High</option>
+                    <option value="100">Very High</option>
+                </select>
+            </label>
+        </div>
+
+        <div class="section">
+            <h3>6. Schedule (New)</h3>
+            <p>Simulate "Today" being inside a range:</p>
+            <input type="text" id="scheduleStart" placeholder="YYYY-MM-DD Start" value="2025-01-01">
+            <input type="text" id="scheduleEnd" placeholder="YYYY-MM-DD End" value="2025-12-31">
+            <br>
+            <label><input type="checkbox" checked> Recur Annually?</label>
+            <br>
+            <input type="text" id="scheduleVal" placeholder="Override Icon" value="🎂">
+            <button onclick="setSchedule()">Apply Schedule Override</button>
+        </div>
+
+        <div class="section">
+            <h3>7. Interaction (New)</h3>
+            <label>Z-Index: <input type="number" id="zIndexInput" value="9999" style="width: 80px;"
+                    onchange="updateInteraction()"></label>
+            <br><br>
+            <label>Mode:
+                <select id="interactionInput" onchange="updateInteraction()">
+                    <option value="none">Pass-through (Safety)</option>
+                    <option value="auto">Block Clicks (Interactive)</option>
+                </select>
+            </label>
+        </div>
+
+        <div class="section">
+            <h3>8. Logic & Timing (New)</h3>
+            <label><input type="checkbox" id="masterDisable" onchange="toggleMaster()"> Master Force Stop</label>
+            <br><br>
+            <label>Buffer Days: Before <input type="number" id="bufferBefore" value="0" style="width:40px;"> After
+                <input type="number" id="bufferAfter" value="0" style="width:40px;"></label>
+            <button onclick="setBuffer()">Test Buffer</button>
+            <p><em>(Check logic in JS console for Date math)</em></p>
+            <br><br>
+            <label>Hemisphere:
+                <select id="hemiInput" onchange="setHemisphere()">
+                    <option value="northern">Northern (Dec=Winter)</option>
+                    <option value="southern">Southern (Dec=Summer)</option>
+                </select>
+            </label>
+        </div>
+
+        <button onclick="reset()" style="background:#d63638;">Reset / Clear</button>
+    </div>
+
+    <!-- Mock the PHP Output -->
+    <script>
+        // Start with a default
+        var seasonalAnimationSettings = {
+            season: 'winter',
+            particle_type: 'default',
+            particle_value: '',
+            enable_fog: '0', // Default Off
+            frequency: '30',
+            interaction_mode: 'none',
+            z_index: '9999'
+        };
+
+        function reloadWithParams(params) {
+            const url = new URL(window.location);
+
+            // Keep existing params if not overwritten
+            for (const [key, value] of Object.entries(params)) {
+                url.searchParams.set(key, value);
+            }
+            window.location.href = url.toString();
+        }
+
+        function setSeason(season) {
+            reloadWithParams({ season: season });
+        }
+
+        function toggleFog() {
+            const isChecked = document.getElementById('fogToggle').checked;
+            reloadWithParams({ enable_fog: isChecked ? '1' : '0' });
+        }
+
+        function setFrequency() {
+            const val = document.getElementById('freqSelect').value;
+            reloadWithParams({ frequency: val });
+        }
+
+        function setSchedule() {
+            // In the real plugin, PHP handles the date check.
+            // Here, we'll just force the values as if PHP sent them.
+            const val = document.getElementById('scheduleVal').value;
+            reloadWithParams({ type: 'emoji', value: val });
+        }
+
+        function updateInteraction() {
+            const z = document.getElementById('zIndexInput').value;
+            const mode = document.getElementById('interactionInput').value;
+            reloadWithParams({ z_index: z, interaction: mode });
+        }
+
+        function toggleMaster() {
+            const isChecked = document.getElementById('masterDisable').checked;
+            if (isChecked) {
+                alert("Master Stop Enabled: No animations will render.");
+                document.getElementById('seasonal-animation-container').remove();
+            } else {
+                window.location.reload();
+            }
+        }
+
+        function setBuffer() {
+            // In real plugin, PHP handles date ranges.
+            alert("Buffer setting saved. If today is within [Holiday - Before] to [Holiday + After], the holiday effect plays.");
+        }
+
+        function setHemisphere() {
+            // Mocking logic
+            const h = document.getElementById('hemiInput').value;
+            alert("Hemisphere set to " + h + ". In real plugin, this inverts the months (e.g., Dec becomes Summer).");
+        }
+
+        function setCustomEmoji() {
+            const val = document.getElementById('emojiInput').value;
+            reloadWithParams({ season: 'winter', type: 'emoji', value: val });
+        }
+
+        function setCustomImage() {
+            const val = document.getElementById('imgInput').value;
+            reloadWithParams({ season: 'winter', type: 'image', value: val });
+        }
+
+        function reset() {
+            window.location.href = window.location.pathname;
+        }
+
+        // Check URL for overrides to mock PHP logic
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('season')) seasonalAnimationSettings.season = urlParams.get('season');
+        if (urlParams.has('type')) seasonalAnimationSettings.particle_type = urlParams.get('type');
+        if (urlParams.has('value')) seasonalAnimationSettings.particle_value = urlParams.get('value');
+        if (urlParams.has('enable_fog')) {
+            seasonalAnimationSettings.enable_fog = urlParams.get('enable_fog');
+            // Sync Checkbox
+        }
+        if (urlParams.has('frequency')) {
+            seasonalAnimationSettings.frequency = urlParams.get('frequency');
+            document.getElementById('freqSelect').value = seasonalAnimationSettings.frequency;
+        }
+        if (urlParams.has('z_index')) {
+            seasonalAnimationSettings.z_index = urlParams.get('z_index');
+            document.getElementById('zIndexInput').value = seasonalAnimationSettings.z_index;
+        }
+        if (urlParams.has('interaction')) {
+            seasonalAnimationSettings.interaction_mode = urlParams.get('interaction');
+            document.getElementById('interactionInput').value = seasonalAnimationSettings.interaction_mode;
+        }
+
+        // Sync Checkbox logic
+        const fogToggle = document.getElementById('fogToggle');
+        if (seasonalAnimationSettings.enable_fog === '0') {
+            fogToggle.checked = false;
+        } else {
+            fogToggle.checked = true;
+        }
+
+    </script>
+
+    <!-- Link the Plugin JS -->
+    <script src="assets/js/seasonal-effects.js"></script>
+
+</body>
+
+</html>
